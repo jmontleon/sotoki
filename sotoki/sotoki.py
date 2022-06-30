@@ -246,7 +246,7 @@ class QuestionRender(handler.ContentHandler):
                 self.post[k] = attrs[k]
             self.post["relateds"] = []  # Prepare list for relateds question
             self.post["duplicate"] = []  # Prepare list for duplicate question
-            self.post["filename"] = self.post["Id"]
+            self.post["filename"] = self.post["Id"] + ".html"
 
             if (
                 "OwnerUserId" in self.post
@@ -327,6 +327,7 @@ class QuestionRender(handler.ContentHandler):
                         + str(ans["Id"])
                         + "\tA/question/"
                         + self.post["Id"]
+                        + ".html"
                         + "\n"
                     )
             with open(redirect_file, "a") as f_redirect:
@@ -337,6 +338,7 @@ class QuestionRender(handler.ContentHandler):
                     + str(self.post["Id"])
                     + "\tA/question/"
                     + self.post["Id"]
+                    + ".html"
                     + "\n"
                 )
 
@@ -488,13 +490,13 @@ class TagsRender(handler.ContentHandler):
         new_questions = []
         questionsids = []
         for question in some_questions:
-            question["filepath"] = str(question["QId"])
+            question["filepath"] = str(question["QId"]) + ".html"
             question["Title"] = html.escape(question["Title"], quote=False)
             if question["QId"] not in questionsids:
                 questionsids.append(question["QId"])
                 new_questions.append(question)
         jinja(
-            os.path.join(output_dir, "index"),
+            os.path.join(output_dir, "index.html"),
             "index.html",
             self.templates,
             False,
@@ -507,7 +509,7 @@ class TagsRender(handler.ContentHandler):
             mathjax=self.mathjax,
         )
         jinja(
-            os.path.join(output_dir, "alltags"),
+            os.path.join(output_dir, "alltags.html"),
             "alltags.html",
             self.templates,
             False,
@@ -543,7 +545,7 @@ class TagsRender(handler.ContentHandler):
                 )
 
             while offset is not None:
-                fullpath = os.path.join(tagpath, "%s" % page)
+                fullpath = os.path.join(tagpath, "%s.html" % page)
                 some_questions = questions.fetchmany(100)
                 if len(some_questions) != 100:
                     offset = None
@@ -551,7 +553,7 @@ class TagsRender(handler.ContentHandler):
                     offset += len(some_questions)
                 some_questions = some_questions[:99]
                 for question in some_questions:
-                    question["filepath"] = str(question["QId"])
+                    question["filepath"] = str(question["QId"]) + ".html"
                     question["Title"] = html.escape(question["Title"], quote=False)
                 hasprevious = page != 1
                 jinja(
@@ -1017,7 +1019,7 @@ def get_image_shortcuts(url, convert_png, resize, ext):
             return (
                 False,
                 download_and_return_name(
-                    url, image_name_prefix, convert_png, resize, ext
+                    url, image_name_prefix, convert_png, resize, ".png"
                 ),
             )
 
@@ -1210,11 +1212,16 @@ def image(text_post, nopic):
                     download_image(src, out, resize=540)
                 except Exception as e:
                     # do nothing
+                    img.attrib["src"] = "../static/images/../../favicon.png"
                     print(e)
                 else:
                     src = "../static/images/" + filename
                     img.attrib["src"] = src
                     img.attrib["style"] = "max-width:100%"
+            else:
+                src = "../static/images/" + filename
+                img.attrib["src"] = src
+                img.attrib["style"] = "max-width:100%"
     # does the post contain images? if so, we surely modified
     # its content so save it.
     if imgs:
