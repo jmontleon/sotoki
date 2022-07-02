@@ -1,0 +1,13 @@
+diff --git a/include/zim/writer/creator.h b/include/zim/writer/creator.h
+index c47c621..21daae8 100644
+--- a/include/zim/writer/creator.h
++++ b/include/zim/writer/creator.h
+@@ -59,7 +59,7 @@ namespace zim
+         bool withIndex = false;
+         size_t minChunkSize = 1024-64;
+         std::string indexingLanguage;
+-        unsigned nbWorkerThreads = 4;
++        unsigned nbWorkerThreads = 64;
+  
+         void fillHeader(Fileheader* header) const;
+         void write() const;

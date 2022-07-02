@@ -1,0 +1,32 @@
+diff --git a/src/zimwriterfs/tools.cpp b/src/zimwriterfs/tools.cpp
+index 06aa8ce..df6f9b2 100644
+--- a/src/zimwriterfs/tools.cpp
++++ b/src/zimwriterfs/tools.cpp
+@@ -276,9 +276,11 @@ std::string getMimeTypeForFile(const std::string &directoryPath, const std::stri
+   auto index_of_last_dot = filename.find_last_of(".");
+   if (index_of_last_dot != std::string::npos) {
+     mimeType = filename.substr(index_of_last_dot + 1);
+-    try {
+-      return extMimeTypes.at(mimeType);
+-    } catch (std::out_of_range&) {}
++    if (mimeType.length() >2 && mimeType.length() <= 4) {
++      try {
++        return extMimeTypes.at(mimeType);
++      } catch (std::out_of_range&) {}
++    }
+   }
+
+   /* Try to get the mimeType from the cache */
+diff --git a/src/zimwriterfs/zimwriterfs.cpp b/src/zimwriterfs/zimwriterfs.cpp
+index dc281f0..14d19c9 100644
+--- a/src/zimwriterfs/zimwriterfs.cpp
++++ b/src/zimwriterfs/zimwriterfs.cpp
+@@ -384,7 +384,7 @@ void create_zim()
+   zimCreator.addMetadata("Scraper", scraper);
+   zimCreator.addMetadata("Tags", tags);
+   zimCreator.addArticle(std::make_shared<MetadataDateArticle>());
+-  zimCreator.addArticle(std::make_shared<MetadataFaviconArticle>(zim::writer::Url('I', favicon)));
++  zimCreator.addArticle(std::make_shared<MetadataFaviconArticle>(zim::writer::Url('A', favicon)));
+
+
+   /* Directory visitor */

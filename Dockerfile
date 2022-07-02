@@ -1,4 +1,75 @@
+FROM ubuntu:kinetic as builder
+
+RUN apt-get update
+RUN apt-get -y install aria2 \
+                       automake \
+                       autopoint \
+                       build-essential \
+                       ccache \
+                       cmake \
+                       curl \
+                       default-jdk \
+                       elfutils \
+                       flatpak \
+                       flatpak-builder \
+                       fuse \
+                       g++-multilib \
+                       gcc \
+                       gcc-multilib \
+                       git \
+                       libbz2-dev \
+                       libc6-dev \
+                       libc6-dev-i386 \
+                       libdocopt-dev \
+                       libfuse2 \
+                       libgl-dev \
+                       libgtest-dev \
+                       libgumbo-dev \
+                       liblzma-dev \
+                       libmagic-dev \
+                       libmicrohttpd-dev \
+                       libtool \
+                       libzstd-dev \
+                       meson \
+                       ninja-build \
+                       openssh-client \
+                       patch \
+                       patchelf \
+                       pkg-config \
+                       python3-pip \
+                       python3-setuptools \
+                       python3-wheel \
+                       subversion \
+                       uuid-dev \
+                       unzip \
+                       wget \
+                       zlib1g-dev
+
+RUN git clone https://github.com/openzim/zim-tools
+RUN git clone https://github.com/openzim/libzim
+
+WORKDIR /libzim
+COPY libzim.patch /libzim/libzim.patch
+RUN git checkout br_6.3
+RUN patch -p1 --ignore-whitespace < libzim.patch
+RUN meson . build --default-library=static
+RUN ninja -C build
+RUN cd build && meson install
+
+WORKDIR /zim-tools
+COPY zim-tools.patch /zim-tools/zim-tools.patch
+RUN git checkout 2.1.0
+RUN patch -p1 --ignore-whitespace < zim-tools.patch
+RUN meson . build -Dstatic-linkage=true
+### BEGIN DUNNO ###
+RUN rm /usr/lib/x86_64-linux-gnu/libdocopt.so.0.6.1
+RUN ln -sf /usr/lib/x86_64-linux-gnu/libdocopt.a /usr/lib/x86_64-linux-gnu/libdocopt.so.0.6.1
+RUN sed -i 's,/usr/lib/x86_64-linux-gnu/libz.a,/usr/lib/x86_64-linux-gnu/libz.a /usr/lib/x86_64-linux-gnu/libbz2.a,g' build/build.ninja 
+### END DUNNO ###
+RUN ninja -C build
+
 FROM python:3.11-rc
+COPY --from=builder /zim-tools/build/src/zimwriterfs/zimwriterfs /usr/local/bin/zimwriterfs
 
 # Install necessary packages
 RUN apt-get update -y \
