@@ -2,6 +2,19 @@
 
 *Stack Overflow to Kiwix*
 
+# This branched implementation can actually build a stackoverflow zim file. It's not pretty, but it works.
+- Build it: `podman build -t sotoki:local . -f Dockerfile`
+- Run it: `podman run --detach --name sotoki --security-opt label=disable --replace -v /work:/work:rw sotoki:local bash -c 'sotoki stackoverflow.com Kiwix --no-userprofile --threads="16" --no-identicons --nozim && zimwriterfs --language=eng --title="Stack Overflow" --description="Where Developers Learn, Share, & Build Careers" --source=https://stackoverflow.com --scraper=sotoki-1.3.2-dev0 --welcome=index.html --favicon=favicon.png --creator="Stack Overflow" --publisher=JM --tags="_category:stack_exchange;stackexchange;stackoverflow" --verbose --uniqueNamespace --zstd --redirects=redirection.csv /work/stackoverflow_com/output /work/stackoverflow.com_en_all.zim'`
+
+# Things to know:
+- sotoki takes about 24 hours to download and convert data when using an existing cache of images
+- Without an existing image cache it could take days to scrape all the images
+- zimwriterfs takes about 16 hours
+- 32GB of RAM is a must, maybe even 64GB
+- 700GB is close to minimum free space
+- sotoki disk intensive. A good NVME disk will help a lot with performance. It's probably borderline unusable on a spinning disk.
+- The output/questions and output/tag directories are difficult to delete because of their gargantuan size. One way is to use rsync, for example `rsync -r --delete emptydir questions`
+
 The goal of this project is to create a suite of tools to create
 [zim](https://openzim.org) files required by
 [kiwix](https://kiwix.org/) reader to make available [Stack Overflow](https://stackoverflow.com/)
