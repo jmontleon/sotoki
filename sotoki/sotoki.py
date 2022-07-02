@@ -1052,12 +1052,12 @@ def handle_duplicate_images(url, fullpath, convert_png, resize):
     if redirection:
         # got a redirection to a common image
         src_path = str(org_path.relative_to(pathlib.Path(output_dir)))
-        dst_path = f"I/common_images/{redirection}"
+        dst_path = f"A/common_images/{redirection}"
         print("before redirect write")
         print("redirection")
         with open(redirect_file, "a") as f_redirect:
             f_redirect.write(
-                "I\t" + f"{src_path}\t" + "Image Redirection\t" + f"{dst_path}\n"
+                "A\t" + f"{src_path}\t" + "Image Redirection\t" + f"{dst_path}\n"
             )
         print(f"Successfully wrote redirection from {src_path} to {dst_path}")
         return True
