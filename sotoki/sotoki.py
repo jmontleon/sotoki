@@ -860,6 +860,8 @@ def get_filetype(path):
         ftype = "gif"
     elif "ico" in mime:
         ftype = "ico"
+    elif "svg+xml" in mime:
+        ftype = "svg"
     return ftype
 
 
