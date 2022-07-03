@@ -25,6 +25,7 @@ RUN apt-get -y install aria2 \
                        libgl-dev \
                        libgtest-dev \
                        libgumbo-dev \
+                       libicu-dev \
                        liblzma-dev \
                        libmagic-dev \
                        libmicrohttpd-dev \
@@ -45,6 +46,14 @@ RUN apt-get -y install aria2 \
                        wget \
                        zlib1g-dev
 
+# Xapian is available as a package but it can't be used for static builds
+RUN wget https://oligarchy.co.uk/xapian/1.4.19/xapian-core-1.4.19.tar.xz
+RUN tar Jxf xapian-core-1.4.19.tar.xz
+WORKDIR xapian-core-1.4.19
+RUN ./configure enable_static=yes
+RUN make install
+
+WORKDIR /
 RUN git clone https://github.com/openzim/zim-tools
 RUN git clone https://github.com/openzim/libzim
 
